@@ -243,8 +243,8 @@ class Trainer:
 
                 im = load_image_as_binary(final_imgs[0].cpu().squeeze(0).numpy())
                 im_gt = load_image_as_binary(gt[0].cpu().squeeze(0).numpy())
-                print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
-                print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
+                # print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
+                # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
 
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(im, im_gt , r_weight , p_weight)
                 test_results["psnr"].append(psnr)
