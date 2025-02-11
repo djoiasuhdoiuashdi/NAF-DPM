@@ -234,9 +234,10 @@ class Trainer:
 
                 height, width = final_imgs.shape[-2:]
                 #METRIC COMPUTATION AND LOGGING
-                r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name ), dtype=np.float64).flatten()[:height * width].reshape(
+                print(type(name), name)
+                r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
-                p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights",name ), dtype=np.float64).flatten()[:height * width].reshape(
+                p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
                 fmeasure, pfmeasure, psnr, drd, _ , _, _ , _ = calculate_metrics(final_imgs[0].cpu(), gt[0].cpu(), r_weight , p_weight)
                 test_results["psnr"].append(psnr)
