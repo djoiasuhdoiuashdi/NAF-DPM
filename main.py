@@ -1,6 +1,7 @@
 from config import load_config
 import argparse
-
+from Binarization.src.trainer import Trainer
+from Binarization.src.tester import Tester
 
 def main():
     parser = argparse.ArgumentParser()
@@ -9,8 +10,6 @@ def main():
     config = load_config(args.config)
     print('Config loaded')
     mode = config.MODE
-    from Binarization.src.trainer import Trainer
-    from Binarization.src.tester import Tester
 
     if mode == 0:
         print("--------------------------")
@@ -25,8 +24,6 @@ def main():
         print("--------------------------")
 
     elif mode == 1:
-
-
         print("--------------------------")
         print('Start Training')
         print("--------------------------")
@@ -38,20 +35,5 @@ def main():
         print('Training complete')
         print("--------------------------")
 
-
-    else: 
-        print("--------------------------")
-        print('Start Finetuning')
-        print("--------------------------")
-
-        finetuner = Finetune(config)
-        finetuner.finetune()
-
-        print("--------------------------")
-        print('Finetuning complete')
-        print("--------------------------")
-
-
-        
 if __name__ == "__main__":
     main()
