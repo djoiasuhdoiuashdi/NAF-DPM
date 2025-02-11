@@ -9,14 +9,8 @@ def main():
     config = load_config(args.config)
     print('Config loaded')
     mode = config.MODE
-    task = config.TASK
-    if task == "Deblurring":
-        from Deblurring.src.trainer import Trainer
-        from Deblurring.src.tester import Tester
-        from Deblurring.src.finetune import Finetune
-    else:
-        from Binarization.src.trainer import Trainer
-        from Binarization.src.tester import Tester
+    from Binarization.src.trainer import Trainer
+    from Binarization.src.tester import Tester
 
     if mode == 0:
         print("--------------------------")
