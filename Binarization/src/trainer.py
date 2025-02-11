@@ -236,9 +236,9 @@ class Trainer:
                 #METRIC COMPUTATION AND LOGGING
                 print(type(name), name) # class 'tuple'> ('DIBCO2009_P03.tiff',)
                 name_str, _ = os.path.splitext(name[0])
-                r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name_str+"_GT_PWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
+                r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name_str+"_GT_RWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
-                p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name_str+"_GT_RWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
+                p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name_str+"_GT_PWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
                 fmeasure, pfmeasure, psnr, drd, _ , _, _ , _ = calculate_metrics(final_imgs[0].cpu(), gt[0].cpu(), r_weight , p_weight)
                 test_results["psnr"].append(psnr)
