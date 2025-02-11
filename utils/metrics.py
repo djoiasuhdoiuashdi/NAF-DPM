@@ -145,7 +145,7 @@ def calculate_metrics(im, im_gt, r_weight, p_weight):
     mse = (FP + FN) / npixel
     psnr = 10.0 * np.log10(1.0 / mse) if mse > 0 else float('inf')
 
-    return f_measure, w_f_measure, psnr, drd, recall, precision, w_recall, w_precision
+    return 100* f_measure,  100* w_f_measure, psnr, drd
 
 
 def parse_arguments():

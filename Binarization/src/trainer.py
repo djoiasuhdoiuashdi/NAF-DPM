@@ -234,7 +234,6 @@ class Trainer:
 
                 height, width = final_imgs.shape[-2:]
                 #METRIC COMPUTATION AND LOGGING
-                print(type(name), name) # class 'tuple'> ('DIBCO2009_P03.tiff',)
                 name_str, _ = os.path.splitext(name[0])
                 r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name_str+"_GT_RWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
@@ -243,9 +242,7 @@ class Trainer:
 
                 im = final_imgs[0].cpu().squeeze(0).numpy()
                 im_gt = gt[0].cpu().squeeze(0).numpy()
-                print(f"im: {im.shape}")
-                print(f"im_gt: {im_gt.shape}")
-                fmeasure, pfmeasure, psnr, drd, _ , _, _ , _ = calculate_metrics(im, im_gt , r_weight , p_weight)
+                fmeasure, pfmeasure, psnr, drd = calculate_metrics(im, im_gt , r_weight , p_weight)
                 test_results["psnr"].append(psnr)
                 test_results["fmeasure"].append(fmeasure)
                 test_results["pseudof"].append(pfmeasure)
