@@ -97,13 +97,6 @@ def get_drd(im, im_gt, normalized_weight_matrix):
 
     return total_drd / total_nubn
 
-
-def load_image_as_binary(image_path):
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    binary_array = (image > 0).astype(np.uint8)
-    return binary_array
-
-
 def calculate_metrics(im, im_gt, r_weight, p_weight):
     height, width = im_gt.shape
 
@@ -155,28 +148,3 @@ def parse_arguments():
     parser.add_argument('r_weight', type=str, help='Path to the r-weight for the ground truth image.')
     parser.add_argument('p_weight', type=str, help='Path to the p-weight for the ground truth image.')
     return parser.parse_args()
-
-
-if __name__ == '__main__':
-    args = parse_arguments()
-
-    # Load images
-    im = load_image_as_binary(args.input_image)
-    im_gt = load_image_as_binary(args.gt_image)
-
-    # Load weights
-    height, width = im_gt.shape
-    r_weight = np.loadtxt(args.r_weight, dtype=np.float64).flatten()[:height * width].reshape((height, width))
-    p_weight = np.loadtxt(args.p_weight, dtype=np.float64).flatten()[:height * width].reshape((height, width))
-
-    f_measure, w_f_measure, psnr, drd, recall, precision, w_recall, w_precision = calculate_metrics(im, im_gt, r_weight,
-                                                                                                    p_weight)
-
-    print(f"F-Measure: {f_measure * 100:.4f}")
-    print(f"Pseudo F-Measure (Fps): {w_f_measure * 100:.4f}")
-    print(f"PSNR: {psnr:.4f}")
-    print(f"DRD: {drd:.4f}")
-    print(f"Recall: {recall * 100:.4f}")
-    print(f"Precision: {precision * 100:.4f}")
-    print(f"Pseudo-Recall (Rps): {w_recall * 100:.4f}")
-    print(f"Pseudo-Precision (Pps): {w_precision * 100:.4f}")

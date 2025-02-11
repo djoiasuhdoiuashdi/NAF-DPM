@@ -6,7 +6,7 @@ from Binarization.schedule.schedule import Schedule
 from Binarization.model.NAFDPM import NAFDPM, EMA
 import utils.util as util
 from utils.metrics import calculate_metrics
-from utils.util import crop_concat, crop_concat_back, min_max
+from utils.util import crop_concat, crop_concat_back, min_max, load_image_as_binary
 from Binarization.schedule.diffusionSample import GaussianDiffusion
 from Binarization.schedule.dpm_solver_pytorch import NoiseScheduleVP, model_wrapper, DPM_Solver
 import torch
@@ -240,8 +240,12 @@ class Trainer:
                 p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name_str+"_GT_PWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
 
-                im = final_imgs[0].cpu().squeeze(0).numpy()
-                im_gt = gt[0].cpu().squeeze(0).numpy()
+
+                im = load_image_as_binary(final_imgs[0].cpu().squeeze(0).numpy())
+                im_gt = load_image_as_binary(gt[0].cpu().squeeze(0).numpy())
+                print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
+                print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
+
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(im, im_gt , r_weight , p_weight)
                 test_results["psnr"].append(psnr)
                 test_results["fmeasure"].append(fmeasure)
