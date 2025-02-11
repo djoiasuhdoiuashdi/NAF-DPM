@@ -241,8 +241,8 @@ class Trainer:
                 p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name_str+"_GT_PWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
 
-                im = final_imgs[0].cpu().squeeze(0)
-                im_gt = gt[0].cpu().squeeze(0)
+                im = final_imgs[0].cpu().squeeze(0).numpy()
+                im_gt = gt[0].cpu().squeeze(0).numpy()
                 print(f"im: {im.shape}")
                 print(f"im_gt: {im_gt.shape}")
                 fmeasure, pfmeasure, psnr, drd, _ , _, _ , _ = calculate_metrics(im, im_gt , r_weight , p_weight)
