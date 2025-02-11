@@ -13,13 +13,13 @@ ENC_BLOCKS : [1,1,1,1]
 DEC_BLOCKS : [1,1,1,1]
 
 
-MODE : 1                 # 0 Test, 1 Train
+MODE : 0                 # 0 Test, 1 Train
 PRE_ORI : 'True'          # if True, predict $x_0$, else predict $/epsilon$.
 TASK: 'Binarization'
 
 # train
-PATH_GT : '/mnt/media/giordano/DIBCO2018RIDOTTO/train_gt'              # path of ground truth
-PATH_IMG : '/mnt/media/giordano/DIBCO2018RIDOTTO/train'            # path of input
+PATH_GT : './dataset/train/images_gt'              # path of ground truth
+PATH_IMG : './dataset/train/images'            # path of input
 BATCH_SIZE : 16          # training batch size
 NUM_WORKERS : 4           # number of workers
 ITERATION_MAX : 100000   # max training iteration
@@ -31,28 +31,28 @@ SAVE_MODEL_EVERY : 10000  # save model every SAVE_MODEL_EVERY iterations
 EMA: 'True'               # if True, use EMA
 CONTINUE_TRAINING : 'False'               # if True, continue training
 CONTINUE_TRAINING_STEPS : 10000          # continue training from CONTINUE_TRAINING_STEPS
-PRETRAINED_PATH_INITIAL_PREDICTOR : '/mnt/media/giordano/DBICO_Checksave2017/BEST_PSNR_model_init.pth'    # path of pretrained initial predictor
-PRETRAINED_PATH_DENOISER : '/mnt/media/giordano/DBICO_Checksave2017/BEST_PSNR_model_denoiser.pth'           # path of pretrained denoiser
-WEIGHT_SAVE_PATH : '/mnt/media/giordano/DBICO_Checksave2018Nuova'          # path to save model
-TRAINING_PATH : '/mnt/media/giordano/DBICO_Training'              # path of training data
+PRETRAINED_PATH_INITIAL_PREDICTOR : './weights/BEST_PSNR_model_init.pth'    # path of pretrained initial predictor
+PRETRAINED_PATH_DENOISER : './weights/BEST_PSNR_model_denoiser.pth'           # path of pretrained denoiser
+WEIGHT_SAVE_PATH : './weights'          # path to save model
+TRAINING_PATH : './Training'              # path of training data ????????????????
 BETA_LOSS : 50            # hyperparameter to balance the pixel loss and the diffusion loss
 HIGH_LOW_FREQ : 'True'    # if True, training with frequency separation
 VALIDATE_EVERY : 1000
 VALIDATE_ITERATIONS: 1000
-WANDB: 'True'
+WANDB: 'False'
 PROJECT: 'NAFDPM_DBICO2018'
 
 #TEST
-NATIVE_RESOLUTION : 'False'               # if True, test with native resolution
+NATIVE_RESOLUTION : 'True' # if True, test with native resolution
 DPM_SOLVER : 'True'      # if True, test with DPM_solver
-DPM_STEP : 10             # DPM_solver step
-BATCH_SIZE_VAL : 1        # test batch size
-TEST_PATH_GT : '/mnt/media/giordano/DIBCODATASET2019/test_gt'         # path of ground truth
-TEST_PATH_IMG : '/mnt/media/giordano/DIBCODATASET2019/test'        # path of input
-TEST_INITIAL_PREDICTOR_WEIGHT_PATH : '/mnt/media/giordano/DBICO_Checksave2019ArchNuova/BEST_Fmeasure_model_init.pth'   # path of initial predictor
-TEST_DENOISER_WEIGHT_PATH : '/mnt/media/giordano/DBICO_Checksave2019ArchNuova/BEST_Fmeasure_model_denoiser.pth'            # path of denoiser
-TEST_IMG_SAVE_PATH : '/mnt/media/giordano/DBICO_Results'          # path to save results
-LOGGER_PATH : '/mnt/media/giordano/DBICO_Logger'
+DPM_STEP : 10
+BATCH_SIZE_VAL : 1
+TEST_PATH_GT : './dataset/test/images'
+TEST_PATH_IMG : './dataset/test/images'
+TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/BEST_Fmeasure_model_init.pth'
+TEST_DENOISER_WEIGHT_PATH : './weights/BEST_Fmeasure_model_denoiser.pth'
+TEST_IMG_SAVE_PATH : './output'
+LOGGER_PATH : './logs'
 
 #METRICS
 

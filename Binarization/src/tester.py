@@ -1,4 +1,7 @@
 import os
+
+import numpy as np
+
 from Binarization.schedule.schedule import Schedule
 from Binarization.model.NAFDPM import NAFDPM, EMA
 from Binarization.schedule.diffusionSample import GaussianDiffusion
@@ -17,8 +20,8 @@ import pyiqa
 import wandb
 
 import utils.util as util
+from utils.metrics import calculate_metrics
 from utils.util import crop_concat, crop_concat_back, min_max
-from utils.metrics import compute_metrics_DIBCO
 
 
 def init__result_Dir(path):
@@ -77,7 +80,7 @@ class Tester:
                 "train" + "DocDiff",
                 level=logging.INFO,
                 screen=True,
-                tofile=True,
+                tofile=False,
             )
         self.logger = logging.getLogger("base")
         self.test_img_save_path = config.TEST_IMG_SAVE_PATH
@@ -130,6 +133,7 @@ class Tester:
                                               drop_last=False,
                                               num_workers=config.NUM_WORKERS)
         else:
+            print(config.TEST_PATH_IMG)
             dataset_test = DocData(config.TEST_PATH_IMG, config.TEST_PATH_GT, config.IMAGE_SIZE, self.mode)
             self.dataloader_test = DataLoader(dataset_test, batch_size=config.BATCH_SIZE_VAL, shuffle=False,
                                               drop_last=False,
@@ -152,9 +156,7 @@ class Tester:
             self.loss = nn.MSELoss()
         if self.high_low_freq == 'True':
             self.high_filter = Laplacian().to(self.device)
-        
 
-        
         #WANDB LOGIN AND SET UP
         self.wandb = config.WANDB
         if self.wandb == "True":
@@ -174,7 +176,7 @@ class Tester:
                 })
 
         else:
-            self.wandb = False 
+            self.wandb = False
 
         #DEFINE METRICS
         self.ssim = pyiqa.create_metric('ssim', device=self.device)
@@ -219,8 +221,8 @@ class Tester:
         
         with torch.no_grad():
             #LOAD CHECKPOINTS FOR INITIAL PREDICTOR AND DENOISER
-            checkpoint_init = torch.load(self.TEST_INITIAL_PREDICTOR_WEIGHT_PATH)
-            checkpoint_denoiser = torch.load(self.TEST_DENOISER_WEIGHT_PATH)
+            checkpoint_init = torch.load(self.TEST_INITIAL_PREDICTOR_WEIGHT_PATH, weights_only=False)
+            checkpoint_denoiser = torch.load(self.TEST_DENOISER_WEIGHT_PATH, weights_only=False)
             self.network.init_predictor.load_state_dict(checkpoint_init['model_state_dict'])
             self.network.denoiser.load_state_dict(checkpoint_denoiser['model_state_dict'])
             #self.network.init_predictor.load_state_dict(torch.load(self.TEST_INITIAL_PREDICTOR_WEIGHT_PATH))
@@ -235,13 +237,13 @@ class Tester:
             iteration = 0
             
             #INIT METRICS DICTIONARY
-            test_results = OrderedDict()
-            test_results["psnr"] = []
-            test_results["ssim"] = []
-            test_results["fmeasure"] = []
-            test_results["pseudof"] = []
-            test_results["drd"] = []
-            
+            # test_results = OrderedDict()
+            # test_results["psnr"] = []
+            # test_results["ssim"] = []
+            # test_results["fmeasure"] = []
+            # test_results["pseudof"] = []
+            # test_results["drd"] = []
+
             #FOR IMAGES IN TESTING DATASET
             for img, gt, name in tq:
                 tq.set_description(f'Iteration {iteration} / {len(self.dataloader_test.dataset)}')
@@ -268,69 +270,80 @@ class Tester:
                     sampledImgs = sampler(noisyImage.cuda(), init_predict, self.pre_ori)
                     
                 #COMPUTE FINAL IMAGES   
-                finalImgs = (sampledImgs + init_predict)
+                final_imgs = (sampledImgs + init_predict)
                 
                 #IF NATIVE RESOLUTION RECONSTRUCT FINAL IMAGES FROM MULTIPLE SUBIMAGES
                 if self.native_resolution == 'True':
-                    finalImgs = crop_concat_back(temp, finalImgs)
+                    final_imgs = crop_concat_back(temp, final_imgs)
                     init_predict = crop_concat_back(temp, init_predict)
                     sampledImgs = crop_concat_back(temp, sampledImgs)
                     img = temp
 
 
-                finalImgs = torch.clamp(finalImgs,0,1)
+                final_imgs = torch.clamp(final_imgs,0,1)
                 #img_save = torch.cat((img, gt, init_predict.cpu(), min_max(sampledImgs.cpu()), finalImgs.cpu()), dim=3)
                 #save_image(img_save, os.path.join(
                 #    self.test_img_save_path, f"{name[0]}.png"), nrow=4)
 
-                save_image((finalImgs>0.5).float(), os.path.join(
+                save_image((final_imgs>0.5).float(), os.path.join(
                     self.test_img_save_path, f"{name[0]}.png"), nrow=1)
 
                                 #METRIC COMPUTATION
 
-                ssim = self.ssim(gt.to(self.device),finalImgs.to(self.device)).item()
-                psnr = self.psnr(gt.to(self.device),finalImgs.to(self.device)).item()
-                
-                fmeasure, pfmeasure, psnr, drd = compute_metrics_DIBCO(finalImgs[0].cpu(),gt[0].cpu())
-                #METRIC LOGGING
-                test_results["psnr"].append(psnr)
-                test_results["ssim"].append(ssim)
+                # ssim = self.ssim(gt.to(self.device),final_imgs.to(self.device)).item()
+                # psnr = self.psnr(gt.to(self.device),finalImgs.to(self.device)).item()
 
-                test_results["fmeasure"].append(fmeasure)
-                test_results["pseudof"].append(pfmeasure)
-                test_results["drd"].append(drd)
+                # fmeasure, pfmeasure, psnr, drd = compute_metrics_DIBCO(finalImgs[0].cpu(),gt[0].cpu())
 
-                self.logger.info(
-                    f"""img:{name[0]} - PSNR: {psnr} dB; SSIM: {ssim}; FMeasure: {fmeasure}; 
-                    PFMeasure: {pfmeasure}; DRD: {drd}; \n"""
-                )
+                # height, width = final_imgs.shape[-2:]
+                # # METRIC COMPUTATION AND LOGGING
+                # r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name), dtype=np.float64).flatten()[
+                #            :height * width].reshape(
+                #     (height, width))
+                # p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name), dtype=np.float64).flatten()[
+                #            :height * width].reshape(
+                #     (height, width))
+                # fmeasure, pfmeasure, psnr, drd, _, _, _, _ = calculate_metrics(final_imgs[0].cpu(), gt[0].cpu(),
+                #                                                                r_weight, p_weight)
+                # #METRIC LOGGING
+                # test_results["psnr"].append(psnr)
+                # test_results["ssim"].append(ssim)
+                #
+                # test_results["fmeasure"].append(fmeasure)
+                # test_results["pseudof"].append(pfmeasure)
+                # test_results["drd"].append(drd)
+                #
+                # self.logger.info(
+                #     f"""img:{name[0]} - PSNR: {psnr} dB; SSIM: {ssim}; FMeasure: {fmeasure};
+                #     PFMeasure: {pfmeasure}; DRD: {drd}; \n"""
+                # )
 
 
-            ave_psnr = sum(test_results["psnr"]) / len(test_results["psnr"])
-            ave_ssim = sum(test_results["ssim"]) / len(test_results["ssim"]) 
-            ave_fmeasure =   sum(test_results["fmeasure"]) / len(test_results["fmeasure"]) 
-            ave_pfmeasure =    sum(test_results["pseudof"]) / len(test_results["pseudof"]) 
-            ave_drd =    sum(test_results["drd"]) / len(test_results["drd"]) 
+            # ave_psnr = sum(test_results["psnr"]) / len(test_results["psnr"])
+            # ave_ssim = sum(test_results["ssim"]) / len(test_results["ssim"])
+            # ave_fmeasure =   sum(test_results["fmeasure"]) / len(test_results["fmeasure"])
+            # ave_pfmeasure =    sum(test_results["pseudof"]) / len(test_results["pseudof"])
+            # ave_drd =    sum(test_results["drd"]) / len(test_results["drd"])
 
-            self.logger.info(
-                "----Average PSNR/SSIM results for {}. Iteration {} ----\n\tPSNR: {:.6f} dB; SSIM: {:.6f}\n".format(
-                "Blur dataset validation", 0, ave_psnr, ave_ssim
-            ))
-
-            self.logger.info( "----Average FMeasure\t: {:.6f}\n".format(ave_fmeasure) )
-            self.logger.info( "----Average PFmeasure\t: {:.6f}\n".format(ave_pfmeasure) )
-            self.logger.info( "----Average DRD\t: {:.6f}\n".format(ave_drd) )
-            
-            if self.wandb:
-                log_dict={}
-                log_dict['psnr'] = ave_psnr
-                log_dict['ssim'] = ave_ssim
-                log_dict['fmeasure'] = ave_fmeasure
-                log_dict['pfmeasure'] = ave_pfmeasure
-                log_dict['drd'] = ave_drd
-                wandb.log(log_dict,step=checkpoint_init['iteration'])
- 
-                wandb.finish()
+            # self.logger.info(
+            #     "----Average PSNR/SSIM results for {}. Iteration {} ----\n\tPSNR: {:.6f} dB; SSIM: {:.6f}\n".format(
+            #     "Blur dataset validation", 0, ave_psnr, ave_ssim
+            # ))
+            #
+            # self.logger.info( "----Average FMeasure\t: {:.6f}\n".format(ave_fmeasure) )
+            # self.logger.info( "----Average PFmeasure\t: {:.6f}\n".format(ave_pfmeasure) )
+            # self.logger.info( "----Average DRD\t: {:.6f}\n".format(ave_drd) )
+            #
+            # if self.wandb:
+            #     log_dict={}
+            #     log_dict['psnr'] = ave_psnr
+            #     log_dict['ssim'] = ave_ssim
+            #     log_dict['fmeasure'] = ave_fmeasure
+            #     log_dict['pfmeasure'] = ave_pfmeasure
+            #     log_dict['drd'] = ave_drd
+            #     wandb.log(log_dict,step=checkpoint_init['iteration'])
+            #
+            #     wandb.finish()
 
 
 def dpm_solver(betas, model, x_T, steps, condition, model_kwargs):

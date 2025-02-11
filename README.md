@@ -137,12 +137,12 @@ Whether it's for training or inference, you just need to modify the configuratio
 
 **BINARIZATION
 ```bash
-python main.py --config Binarization/conf.yml
+python main.py --config Binarization/test.yml
 ```
 
 **DEBLURRING
 ```bash
-python main.py --config Deblurring/conf.yml
+python main.py --config Deblurring/test.yml
 ```
 
 MODE=1 is for training, MODE=0 is for inference, MODE=2 is for finetuning (only for deblurring). The parameters in `conf.yml` have detailed annotations, so you can modify them as needed. Please change and properly set path to test/train dataset, log folders and pretraining models (if needed). 

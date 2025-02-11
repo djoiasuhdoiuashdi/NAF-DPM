@@ -4,7 +4,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='conf.yml', help='path to the config.yaml file')
+    parser.add_argument('--config', type=str, default='./Binarization/test.yml', help='path to the test.yaml file')
     args = parser.parse_args()
     config = load_config(args.config)
     print('Config loaded')

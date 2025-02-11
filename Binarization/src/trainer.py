@@ -1,7 +1,11 @@
 import os
+
+import numpy as np
+
 from Binarization.schedule.schedule import Schedule
 from Binarization.model.NAFDPM import NAFDPM, EMA
 import utils.util as util
+from utils.metrics import calculate_metrics
 from utils.util import crop_concat, crop_concat_back, min_max
 from Binarization.schedule.diffusionSample import GaussianDiffusion
 from Binarization.schedule.dpm_solver_pytorch import NoiseScheduleVP, model_wrapper, DPM_Solver
@@ -17,7 +21,6 @@ import logging
 from collections import OrderedDict
 import pyiqa
 import wandb
-from utils.metrics import compute_metrics_DIBCO
 
 
 class Trainer:
@@ -191,7 +194,7 @@ class Trainer:
             tq = tqdm(self.dataloader_test)
             iteration = 0
             #FOR IMAGE IN VALIDATION DATASET
-            for img, gt, _ in tq:
+            for img, gt, name in tq:
                 tq.set_description(f'VALIDATION PHASE {current_iteration} Iteration {iteration} / {len(self.dataloader_test.dataset)}')
                 iteration += 1
                 
@@ -200,7 +203,7 @@ class Trainer:
                     temp = img
                     img = crop_concat(img)
                 #INIT RANDOM NOISE
-                noisyImage = torch.randn_like(img).to(self.device)
+                noisy_image = torch.randn_like(img).to(self.device)
                 
                 #FIRST INITIAL PREDICTION
                 init_predict = self.network.init_predictor(img.to(self.device))
@@ -208,31 +211,39 @@ class Trainer:
                 #REFINE RESIDUAL IMAGE USING DPM SOLVER OR DDIM
                 if self.DPM_SOLVER == 'True':   
                     #DPM SOLVER BRANCH
-                    sampledImgs = dpm_solver(self.schedule.get_betas(), self.network.denoiser,
-                                             noisyImage, self.DPM_STEP, init_predict,model_kwargs={})
+                    sampled_imgs = dpm_solver(self.schedule.get_betas(), self.network.denoiser,
+                                             noisy_image, self.DPM_STEP, init_predict,model_kwargs={})
                 else:
                     #DDIM BRANCH
-                    sampledImgs = self.diffusion(noisyImage.cuda(), init_predict, self.pre_ori)
+                    sampled_imgs = self.diffusion(noisy_image.cuda(), init_predict, self.pre_ori)
                 
                 #COMPUTE FINAL IMAGES
-                finalImgs = (sampledImgs + init_predict)
+                final_imgs = (sampled_imgs + init_predict)
                 
                 #IF NATIVE RESOLUTION RECONSTRUCT FINAL IMAGES FROM MULTIPLE SUBIMAGES
                 if self.native_resolution == 'True':
-                    finalImgs = crop_concat_back(temp, finalImgs)
-                    init_predict = crop_concat_back(temp, init_predict)
-                    sampledImgs = crop_concat_back(temp, sampledImgs)
-                    img = temp
+                    final_imgs = crop_concat_back(temp, final_imgs)
+                    # init_predict = crop_concat_back(temp, init_predict)
+                    # sampledImgs = crop_concat_back(temp, sampledImgs)
+                    # img = temp
 
-                finalImgs = torch.clamp(finalImgs,0,1)
-                
+
+
+                final_imgs = torch.clamp(final_imgs,0,1)
+
+
+                height, width = final_imgs.shape[-2:]
                 #METRIC COMPUTATION AND LOGGING
-                fmeasure, pfmeasure, psnr, drd = compute_metrics_DIBCO(finalImgs[0].cpu(),gt[0].cpu())
+                r_weight = np.loadtxt(os.path.join("./dataset/validation/r_weights", name ), dtype=np.float64).flatten()[:height * width].reshape(
+                    (height, width))
+                p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights",name ), dtype=np.float64).flatten()[:height * width].reshape(
+                    (height, width))
+                fmeasure, pfmeasure, psnr, drd, _ , _, _ , _ = calculate_metrics(final_imgs[0].cpu(), gt[0].cpu(), r_weight , p_weight)
                 test_results["psnr"].append(psnr)
                 test_results["fmeasure"].append(fmeasure)
                 test_results["pseudof"].append(pfmeasure)
                 test_results["drd"].append(drd)
-                ssim = self.ssim(gt.to(self.device),finalImgs.to(self.device)).item()
+                ssim = self.ssim(gt.to(self.device),final_imgs.to(self.device)).item()
                 test_results["ssim"].append(ssim)
 
 
@@ -246,9 +257,9 @@ class Trainer:
             self.logger.info( "----Average PSNR\t: {:.6f}\n".format(ave_psnr) )
             ave_ssim = sum(test_results["ssim"]) / len(test_results["ssim"])
             self.logger.info( "----Average SSIM\t: {:.6f}\n".format(ave_ssim) )
-            ave_fmeasure =   sum(test_results["fmeasure"]) / len(test_results["fmeasure"]) 
+            ave_fmeasure =   sum(test_results["fmeasure"]) / len(test_results["fmeasure"])
             self.logger.info( "----Average FMeasure\t: {:.6f}\n".format(ave_fmeasure) )
-            ave_pfmeasure =    sum(test_results["pseudof"]) / len(test_results["pseudof"]) 
+            ave_pfmeasure =    sum(test_results["pseudof"]) / len(test_results["pseudof"])
             self.logger.info( "----Average PFMeasure\t: {:.6f}\n".format(ave_pfmeasure) )
             ave_drd =    sum(test_results["drd"]) / len(test_results["drd"])
             self.logger.info( "----Average DRD\t: {:.6f}\n".format(ave_drd) )
