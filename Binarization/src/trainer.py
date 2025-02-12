@@ -5,8 +5,8 @@ import numpy as np
 from Binarization.schedule.schedule import Schedule
 from Binarization.model.NAFDPM import NAFDPM, EMA
 import utils.util as util
-from utils.metrics import calculate_metrics
-from utils.util import crop_concat, crop_concat_back, min_max, load_image_as_binary
+from utils.metrics import calculate_metrics, load_image_as_binary
+from utils.util import crop_concat, crop_concat_back
 from Binarization.schedule.diffusionSample import GaussianDiffusion
 from Binarization.schedule.dpm_solver_pytorch import NoiseScheduleVP, model_wrapper, DPM_Solver
 import torch
@@ -241,12 +241,24 @@ class Trainer:
                     (height, width))
 
 
-                im = load_image_as_binary(final_imgs[0].cpu().squeeze(0).numpy())
-                im_gt = load_image_as_binary(gt[0].cpu().squeeze(0).numpy())
+                im = final_imgs[0].cpu().squeeze(0).numpy()
+                im_gt = gt[0].cpu().squeeze(0).numpy()
                 # print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
                 # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
 
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(im, im_gt , r_weight , p_weight)
+                print("F-Measure:", fmeasure)
+                print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
+                print("PSNR:", psnr)
+                print("Distance Reduction Ratio (DRD):", drd)
+
+
+                fmeasure, pfmeasure, psnr, drd = calculate_metrics(load_image_as_binary(im), load_image_as_binary(im_gt), r_weight, p_weight)
+                print("F-Measure:", fmeasure)
+                print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
+                print("PSNR:", psnr)
+                print("Distance Reduction Ratio (DRD):", drd)
+
                 test_results["psnr"].append(psnr)
                 test_results["fmeasure"].append(fmeasure)
                 test_results["pseudof"].append(pfmeasure)

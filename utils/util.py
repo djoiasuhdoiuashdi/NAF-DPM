@@ -308,7 +308,3 @@ def init__result_Dir(path):
     path = os.path.join(work_dir, str(max_model))
     os.mkdir(path)
     return path
-
-def load_image_as_binary(image):
-    binary_array = (image > 0).astype(np.uint8)
-    return binary_array

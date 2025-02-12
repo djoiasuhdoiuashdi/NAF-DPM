@@ -111,7 +111,6 @@ def calculate_metrics(im, im_gt, r_weight, p_weight):
 
     # Compute weighted weights
     weighted_p_weight = 1.0 + p_weight
-    weighted_r_weight = 1.0 + r_weight
 
     # Sum weighted weights using masks
     TPwp = weighted_p_weight[TP_mask].sum()
@@ -143,6 +142,9 @@ def calculate_metrics(im, im_gt, r_weight, p_weight):
 
     return f_measure,  w_f_measure, psnr, drd
 
+def load_image_as_binary(image):
+    binary_array = (image > 0).astype(np.uint8)
+    return binary_array
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Compare two binarized images with a weighting factor.')
