@@ -246,9 +246,9 @@ class Trainer:
                 im_gt = gt[0].cpu().squeeze(0).numpy()
 
                 im_pil = Image.fromarray(im)
-                im_pil.save(name+".tiff")
+                im_pil.save(name_str+".tiff")
                 im_gt = Image.fromarray(im_gt)
-                im_gt.save(name +".tiff")
+                im_gt.save(name_str +".tiff")
                 # print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
                 # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
 
