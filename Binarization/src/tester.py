@@ -285,8 +285,10 @@ class Tester:
                 #save_image(img_save, os.path.join(
                 #    self.test_img_save_path, f"{name[0]}.png"), nrow=4)
 
+                name_str, _ = os.path.splitext(name[0])
+
                 save_image((final_imgs>0.5).float(), os.path.join(
-                    self.test_img_save_path, f"{name[0]}.png"), nrow=1)
+                    self.test_img_save_path, f"{name_str}.png"), nrow=1)
 
                                 #METRIC COMPUTATION
 
