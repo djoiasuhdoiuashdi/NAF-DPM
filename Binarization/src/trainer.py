@@ -253,15 +253,14 @@ class Trainer:
                 # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
 
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(im, im_gt , r_weight , p_weight)
+                print("*"*20)
+                print(name_str)
                 print("F-Measure:", fmeasure)
                 print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
                 print("PSNR:", psnr)
                 print("Distance Reduction Ratio (DRD):", drd)
 
-
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(load_image_as_binary(im), load_image_as_binary(im_gt), r_weight, p_weight)
-
-
 
                 print("F-Measure:", fmeasure)
                 print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
