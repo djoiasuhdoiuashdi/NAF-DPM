@@ -1,5 +1,6 @@
 import os
 
+import cv2
 import numpy as np
 from PIL import Image
 
@@ -242,8 +243,10 @@ class Trainer:
                     (height, width))
 
 
-                im = final_imgs[0].cpu().squeeze(0).numpy()
-                im_gt = gt[0].cpu().squeeze(0).numpy()
+                im = final_imgs[0].cpu()[0].numpy()
+                im_gt = gt[0].cpu()[0].numpy()
+                _, im = cv2.threshold(im, 0.5, 1, cv2.THRESH_BINARY)
+                _, im_gt = cv2.threshold(im_gt, 0.5, 1, cv2.THRESH_BINARY)
 
                 print("The shapes are: ", im.shape)
                 print("The gt_shapes are: ", im_gt.shape)
