@@ -161,7 +161,9 @@ class Trainer:
                     "iterations": self.iteration_max,
                     "Native": self.native_resolution,
                     "DPM_Solver": self.DPM_SOLVER,
-                    "Sampling_Steps": config.TIMESTEPS
+                    "Sampling_Steps": config.TIMESTEPS,
+                    "Batch_Size": config.BATCH_SIZE,
+                    "NUM_WORKERS": config.NUM_WORKERS,
             })
         else:
             self.wandb = False 
@@ -229,11 +231,7 @@ class Trainer:
                     # sampledImgs = crop_concat_back(temp, sampledImgs)
                     # img = temp
 
-
-
                 final_imgs = torch.clamp(final_imgs,0,1)
-
-
                 height, width = final_imgs.shape[-2:]
                 #METRIC COMPUTATION AND LOGGING
                 name_str, _ = os.path.splitext(name[0])
@@ -242,36 +240,12 @@ class Trainer:
                 p_weight = np.loadtxt(os.path.join("./dataset/validation/p_weights", name_str+"_GT_PWeights.dat"), dtype=np.float64).flatten()[:height * width].reshape(
                     (height, width))
 
-
                 im = final_imgs[0].cpu()[0].numpy()
                 im_gt = gt[0].cpu()[0].numpy()
                 _, im = cv2.threshold(im, 0.5, 1, cv2.THRESH_BINARY)
                 _, im_gt = cv2.threshold(im_gt, 0.5, 1, cv2.THRESH_BINARY)
 
-                print("The shapes are: ", im.shape)
-                print("The gt_shapes are: ", im_gt.shape)
-
-                im_pil = Image.fromarray(im)
-                im_pil.save("./outy/" + name_str+".tiff")
-                im_gt_pil = Image.fromarray(im_gt)
-                im_gt_pil.save("./outy/" +name_str +"_gt.tiff")
-                # print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
-                # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
-
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(im, im_gt , r_weight , p_weight)
-                print("*"*20)
-                print(name_str)
-                print("F-Measure:", fmeasure)
-                print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
-                print("PSNR:", psnr)
-                print("Distance Reduction Ratio (DRD):", drd)
-
-                fmeasure, pfmeasure, psnr, drd = calculate_metrics(load_image_as_binary(im), load_image_as_binary(im_gt), r_weight, p_weight)
-
-                print("F-Measure:", fmeasure)
-                print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
-                print("PSNR:", psnr)
-                print("Distance Reduction Ratio (DRD):", drd)
 
                 test_results["psnr"].append(psnr)
                 test_results["fmeasure"].append(fmeasure)
