@@ -327,7 +327,7 @@ class Trainer:
                 torch.save(to_save,#self.network.denoiser.state_dict(),
                     os.path.join(self.weight_save_path, f'BEST_Fmeasure_model_denoiser.pth'))
 
-            if ave_pfmeasure < self.bestPFmeasure:
+            if ave_pfmeasure > self.bestPFmeasure:
                 self.bestPFmeasure = ave_pfmeasure
                 to_save = {
                         'iteration': current_iteration,
