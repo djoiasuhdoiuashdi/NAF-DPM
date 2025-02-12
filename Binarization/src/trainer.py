@@ -251,7 +251,7 @@ class Trainer:
                 im_pil = Image.fromarray(im)
                 im_pil.save("./outy/" + name_str+".tiff")
                 im_gt_pil = Image.fromarray(im_gt)
-                im_gt_pil.save("./outy/" +name_str +".tiff")
+                im_gt_pil.save("./outy/" +name_str +"_gt.tiff")
                 # print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
                 # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
 
