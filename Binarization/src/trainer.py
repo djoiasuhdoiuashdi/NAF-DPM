@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+from PIL import Image
 
 from Binarization.schedule.schedule import Schedule
 from Binarization.model.NAFDPM import NAFDPM, EMA
@@ -243,6 +244,11 @@ class Trainer:
 
                 im = final_imgs[0].cpu().squeeze(0).numpy()
                 im_gt = gt[0].cpu().squeeze(0).numpy()
+
+                im_pil = Image.fromarray(im)
+                im_pil.save(name)
+                im_gt = Image.fromarray(im_gt)
+                im_gt.save(name)
                 # print(f"im_binary - Max: {np.max(im)}, Min: {np.min(im)}")
                 # print(f"im_gt_binary - Max: {np.max(im_gt)}, Min: {np.min(im_gt)}")
 
@@ -254,6 +260,9 @@ class Trainer:
 
 
                 fmeasure, pfmeasure, psnr, drd = calculate_metrics(load_image_as_binary(im), load_image_as_binary(im_gt), r_weight, p_weight)
+
+
+
                 print("F-Measure:", fmeasure)
                 print("Precision-Recall F-Measure (PF-Measure):", pfmeasure)
                 print("PSNR:", psnr)
