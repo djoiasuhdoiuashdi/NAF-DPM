@@ -174,7 +174,7 @@ class Trainer:
             wandb.define_metric("ssim", summary="max")
             wandb.define_metric("fmeasure", summary="max")
             wandb.define_metric("pfmeasure", summary="max")
-            wandb.define_metric("drd", summary="max")
+            wandb.define_metric("drd", summary="min")
 
 
     # VALIDATE FUNCTION
