@@ -2,12 +2,11 @@ import os
 
 import cv2
 import numpy as np
-from PIL import Image
 
 from Binarization.schedule.schedule import Schedule
 from Binarization.model.NAFDPM import NAFDPM, EMA
 import utils.util as util
-from utils.metrics import calculate_metrics, load_image_as_binary
+from utils.metrics import calculate_metrics
 from utils.util import crop_concat, crop_concat_back
 from Binarization.schedule.diffusionSample import GaussianDiffusion
 from Binarization.schedule.dpm_solver_pytorch import NoiseScheduleVP, model_wrapper, DPM_Solver
@@ -152,7 +151,7 @@ class Trainer:
         if self.wandb == "True":
             self.wandb = True
             wandb.login()
-            run = wandb.init(
+            wandb.init(
                 # Set the project where this run will be logged
                 project=config.PROJECT,
                 # Track hyperparameters and run metadata
@@ -227,9 +226,6 @@ class Trainer:
                 #IF NATIVE RESOLUTION RECONSTRUCT FINAL IMAGES FROM MULTIPLE SUBIMAGES
                 if self.native_resolution == 'True':
                     final_imgs = crop_concat_back(temp, final_imgs)
-                    # init_predict = crop_concat_back(temp, init_predict)
-                    # sampledImgs = crop_concat_back(temp, sampledImgs)
-                    # img = temp
 
                 final_imgs = torch.clamp(final_imgs,0,1)
                 height, width = final_imgs.shape[-2:]
@@ -380,7 +376,9 @@ class Trainer:
                 #PASS IMAGES AND T THROUGH THE NETWORK
                 init_predict, noise_pred, noisy_image, noise_ref = self.network(gt.to(self.device), img.to(self.device),
                                                                                 t, self.diffusion)
-                
+                low_freq_loss = None
+                low_high_loss = None
+
                 if self.pre_ori == 'True':
                     if self.high_low_freq == 'True':
                         residual_high = self.high_filter(gt.to(self.device) - init_predict)
@@ -397,7 +395,7 @@ class Trainer:
                 else:
                     pixel_loss = self.loss(init_predict, gt.to(self.device))
 
-                loss = ddpm_loss + self.beta_loss * (pixel_loss) / self.num_timesteps
+                loss = ddpm_loss + self.beta_loss * pixel_loss / self.num_timesteps
                 loss.backward()
                 optimizer.step()
                 
@@ -458,7 +456,7 @@ class Trainer:
 
 
 
-def dpm_solver(betas, model, x_T, steps, condition, model_kwargs):
+def dpm_solver(betas, model, x_t, steps, condition, model_kwargs):
     # You need to firstly define your model and the extra inputs of your model,
     # And initialize an `x_T` from the standard normal distribution.
     # `model` has the format: model(x_t, t_input, **model_kwargs).
@@ -491,16 +489,16 @@ def dpm_solver(betas, model, x_T, steps, condition, model_kwargs):
     # (We recommend singlestep DPM-Solver for unconditional sampling)
     # You can adjust the `steps` to balance the computation
     # costs and the sample quality.
-    dpm_solver = DPM_Solver(model_fn, noise_schedule, algorithm_type="dpmsolver++",
-                            correcting_x0_fn="dynamic_thresholding")
+    dpm_solver_instance = DPM_Solver(model_fn, noise_schedule, algorithm_type="dpmsolver++",
+                                     correcting_x0_fn="dynamic_thresholding")
     # Can also try
     # dpm_solver = DPM_Solver(model_fn, noise_schedule, algorithm_type="dpmsolver++")
 
     # You can use steps = 10, 12, 15, 20, 25, 50, 100.
     # Empirically, we find that steps in [10, 20] can generate quite good samples.
     # And steps = 20 can almost converge.
-    x_sample = dpm_solver.sample(
-        x_T,
+    x_sample = dpm_solver_instance.sample(
+        x_t,
         steps=steps,
         order=1,
         skip_type="time_uniform",

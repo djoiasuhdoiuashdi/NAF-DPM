@@ -37,7 +37,7 @@ WEIGHT_SAVE_PATH : './weights'          # path to save model
 TRAINING_PATH : './Training'              # path of training data ????????????????
 BETA_LOSS : 50            # hyperparameter to balance the pixel loss and the diffusion loss
 HIGH_LOW_FREQ : 'True'    # if True, training with frequency separation
-VALIDATE_EVERY : 1000 # TODO 1000 was original, now 50 for testing purpose!!!
+VALIDATE_EVERY : 1000 # orig: 1000
 VALIDATE_ITERATIONS: 1000
 WANDB: 'True'
 PROJECT: 'NAF-DPM'
