@@ -245,6 +245,9 @@ class Trainer:
                 im = final_imgs[0].cpu().squeeze(0).numpy()
                 im_gt = gt[0].cpu().squeeze(0).numpy()
 
+                print("The shapes are: ", im.shape)
+                print("The gt_shapes are: ", im_gt.shape)
+
                 im_pil = Image.fromarray(im)
                 im_pil.save("./outy/" + name_str+".tiff")
                 im_gt_pil = Image.fromarray(im_gt)
