@@ -51,7 +51,7 @@ TEST_PATH_GT : './dataset/test/'
 TEST_PATH_IMG : './dataset/test/'
 TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/run-2/BEST_PFmeasure_model_init.pth'
 TEST_DENOISER_WEIGHT_PATH : './weights/run-2/BEST_PFmeasure_model_denoiser.pth'
-TEST_IMG_SAVE_PATH : './output'
+TEST_IMG_SAVE_PATH : './output/nafdpm_best_pfmeasure_2'
 LOGGER_PATH : './logs'
 
 #METRICS
