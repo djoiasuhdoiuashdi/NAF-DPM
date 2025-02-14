@@ -20,7 +20,7 @@ TASK: 'Binarization'
 # train
 PATH_GT : './dataset/train/images_gt'              # path of ground truth
 PATH_IMG : './dataset/train/images'            # path of input
-BATCH_SIZE : 26          # training batch size orig: 16
+BATCH_SIZE : 28          # training batch size orig: 16
 NUM_WORKERS : 32           # number of workers orig: 4
 ITERATION_MAX : 60000   # max training iteration
 LR : 0.000125              # learning rate orig: 0.0001
