@@ -50,7 +50,7 @@ BATCH_SIZE_VAL : 1
 TEST_PATH_GT : './dataset/test/'
 TEST_PATH_IMG : './dataset/test/'
 TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/run-3/model_init_45000.pth'
-TEST_DENOISER_WEIGHT_PATH : './weights/run-3/model_denoiser_45000.pth'
+TEST_DENOISER_WEIGHT_PATH : './weights/run-3/model_denoiser_40000.pth'
 TEST_IMG_SAVE_PATH : './output/nafdpm_45000_3'
 LOGGER_PATH : './logs'
 
