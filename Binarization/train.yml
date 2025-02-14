@@ -22,7 +22,7 @@ PATH_GT : './dataset/train/images_gt'              # path of ground truth
 PATH_IMG : './dataset/train/images'            # path of input
 BATCH_SIZE : 28          # training batch size orig: 16
 NUM_WORKERS : 32           # number of workers orig: 4
-ITERATION_MAX : 60000   # max training iteration
+ITERATION_MAX : 40000   # max training iteration
 LR : 0.0001              # learning rate orig: 0.0001
 LOSS : 'L2'               # L1 or L2
 EMA_EVERY : 100           # update EMA every EMA_EVERY iterations
