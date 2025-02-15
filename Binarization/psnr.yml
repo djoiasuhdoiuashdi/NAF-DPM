@@ -49,9 +49,9 @@ DPM_STEP : 10
 BATCH_SIZE_VAL : 1
 TEST_PATH_GT : './dataset/test/'
 TEST_PATH_IMG : './dataset/test/'
-TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/run-3/BEST_PSNR_model_init.pth'
-TEST_DENOISER_WEIGHT_PATH : './weights/run-3/BEST_PSNR_model_denoiser.pth'
-TEST_IMG_SAVE_PATH : './output/nafdpm_best_psnr_3'
+TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/run-4/BEST_PSNR_model_init.pth'
+TEST_DENOISER_WEIGHT_PATH : './weights/run-4/BEST_PSNR_model_denoiser.pth'
+TEST_IMG_SAVE_PATH : './output/nafdpm_best_psnr_4'
 LOGGER_PATH : './logs'
 
 #METRICS
