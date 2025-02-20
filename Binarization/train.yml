@@ -22,12 +22,12 @@ PATH_GT : './dataset/train/images_gt'              # path of ground truth
 PATH_IMG : './dataset/train/images'            # path of input
 BATCH_SIZE : 28          # training batch size orig: 16
 NUM_WORKERS : 32           # number of workers orig: 4
-ITERATION_MAX : 40000   # max training iteration
+ITERATION_MAX : 100000   # max training iteration
 LR : 0.0001              # learning rate orig: 0.0001
 LOSS : 'L2'               # L1 or L2
 EMA_EVERY : 100           # update EMA every EMA_EVERY iterations
 START_EMA : 2000          # start EMA after START_EMA iterations
-SAVE_MODEL_EVERY : 5000  # save model every SAVE_MODEL_EVERY iterations orig: 10000
+SAVE_MODEL_EVERY : 10000  # save model every SAVE_MODEL_EVERY iterations orig: 10000
 EMA: 'True'               # if True, use EMA
 CONTINUE_TRAINING : 'False'               # if True, continue training
 CONTINUE_TRAINING_STEPS : 10000          # continue training from CONTINUE_TRAINING_STEPS
