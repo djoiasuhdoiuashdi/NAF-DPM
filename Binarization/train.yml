@@ -18,8 +18,8 @@ PRE_ORI : 'True'          # if True, predict $x_0$, else predict $/epsilon$.
 TASK: 'Binarization'
 
 # train
-PATH_GT : './dataset/without_2019/images_gt'              # path of ground truth
-PATH_IMG : './dataset/without_2019/images'            # path of input
+PATH_GT : './dataset/without_2019_enhanced/images_gt'              # path of ground truth
+PATH_IMG : './dataset/without_2019_enhanced/images'            # path of input
 BATCH_SIZE : 28          # training batch size orig: 16
 NUM_WORKERS : 32           # number of workers orig: 4
 ITERATION_MAX : 100000   # max training iteration
@@ -33,7 +33,7 @@ CONTINUE_TRAINING : 'False'               # if True, continue training
 CONTINUE_TRAINING_STEPS : 10000          # continue training from CONTINUE_TRAINING_STEPS
 PRETRAINED_PATH_INITIAL_PREDICTOR : './weights/BEST_PSNR_model_init.pth'    # path of pretrained initial predictor
 PRETRAINED_PATH_DENOISER : './weights/BEST_PSNR_model_denoiser.pth'           # path of pretrained denoiser
-WEIGHT_SAVE_PATH : './weights/without2019'          # path to save model
+WEIGHT_SAVE_PATH : './weights/without_2019_enhanced'          # path to save model
 TRAINING_PATH : './Training'              # path of training data ????????????????
 BETA_LOSS : 50            # hyperparameter to balance the pixel loss and the diffusion loss
 HIGH_LOW_FREQ : 'True'    # if True, training with frequency separation
