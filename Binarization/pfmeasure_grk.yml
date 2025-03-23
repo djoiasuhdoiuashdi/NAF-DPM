@@ -13,45 +13,45 @@ ENC_BLOCKS : [1,1,1,1]
 DEC_BLOCKS : [1,1,1,1]
 
 
-MODE : 1                 # 0 Test, 1 Train
+MODE : 0                 # 0 Test, 1 Train
 PRE_ORI : 'True'          # if True, predict $x_0$, else predict $/epsilon$.
 TASK: 'Binarization'
 
 # train
 PATH_GT : './dataset/without_2019/images_gt'              # path of ground truth
 PATH_IMG : './dataset/without_2019/images'            # path of input
-BATCH_SIZE : 28          # training batch size orig: 16
-NUM_WORKERS : 32           # number of workers orig: 4
-ITERATION_MAX : 60000   # max training iteration
-LR : 0.0001              # learning rate orig: 0.0001
+BATCH_SIZE : 16          # training batch size
+NUM_WORKERS : 4           # number of workers
+ITERATION_MAX : 100000   # max training iteration
+LR : 0.0001               # learning rate
 LOSS : 'L2'               # L1 or L2
 EMA_EVERY : 100           # update EMA every EMA_EVERY iterations
 START_EMA : 2000          # start EMA after START_EMA iterations
-SAVE_MODEL_EVERY : 10000  # save model every SAVE_MODEL_EVERY iterations orig: 10000
+SAVE_MODEL_EVERY : 10000  # save model every SAVE_MODEL_EVERY iterations
 EMA: 'True'               # if True, use EMA
 CONTINUE_TRAINING : 'False'               # if True, continue training
 CONTINUE_TRAINING_STEPS : 10000          # continue training from CONTINUE_TRAINING_STEPS
-PRETRAINED_PATH_INITIAL_PREDICTOR : './weights/nafdpm/BEST_PSNR_model_init.pth'    # path of pretrained initial predictor
-PRETRAINED_PATH_DENOISER : './weights/nafdpm/BEST_PSNR_model_denoiser.pth'           # path of pretrained denoiser
-WEIGHT_SAVE_PATH : './weights/nafdpm/'          # path to save model
+PRETRAINED_PATH_INITIAL_PREDICTOR : './weights/BEST_PSNR_model_init.pth'    # path of pretrained initial predictor
+PRETRAINED_PATH_DENOISER : './weights/BEST_PSNR_model_denoiser.pth'           # path of pretrained denoiser
+WEIGHT_SAVE_PATH : './weights'          # path to save model
 TRAINING_PATH : './Training'              # path of training data ????????????????
 BETA_LOSS : 50            # hyperparameter to balance the pixel loss and the diffusion loss
 HIGH_LOW_FREQ : 'True'    # if True, training with frequency separation
-VALIDATE_EVERY : 1000 # orig: 1000
+VALIDATE_EVERY : 1000
 VALIDATE_ITERATIONS: 1000
-WANDB: 'True'
-PROJECT: 'NAF-DPM'
+WANDB: 'False'
+PROJECT: 'NAFDPM_DBICO2018'
 
 #TEST
 NATIVE_RESOLUTION : 'True' # if True, test with native resolution
 DPM_SOLVER : 'True'      # if True, test with DPM_solver
 DPM_STEP : 10
 BATCH_SIZE_VAL : 1
-TEST_PATH_GT : './dataset/validation/images_gt'
-TEST_PATH_IMG : './dataset/validation/images'
-TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/nafdpm/BEST_Fmeasure_model_init.pth'
-TEST_DENOISER_WEIGHT_PATH : './weights/nafdpm/BEST_Fmeasure_model_denoiser.pth'
-TEST_IMG_SAVE_PATH : './output'
+TEST_PATH_GT : './dataset/test'
+TEST_PATH_IMG : './dataset/test'
+TEST_INITIAL_PREDICTOR_WEIGHT_PATH : './weights/without_2019/BEST_PFmeasure_model_init.pth'
+TEST_DENOISER_WEIGHT_PATH : './weights/without_2019/BEST_PFmeasure_model_denoiser.pth'
+TEST_IMG_SAVE_PATH : './results/without_2019_enhanced_nafdpm_pfmeasure'
 LOGGER_PATH : './logs'
 
 #METRICS
